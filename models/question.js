@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Question Schema
 const questionSchema = new mongoose.Schema(
   {
     title: {
@@ -17,6 +18,7 @@ const questionSchema = new mongoose.Schema(
   }
 );
 
+// Question Model
 const Question = mongoose.model('Question', questionSchema);
 
 module.exports = Question;

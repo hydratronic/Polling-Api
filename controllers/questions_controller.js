@@ -1,14 +1,14 @@
 const Question = require('../models/question');
 const Option = require('../models/option');
 
-// To create a question
+// Create a question
 module.exports.createQuestion = async (req, res) => {
   try {
     const { title } = req.body;
 
     if (!title) {
       return res.status(400).json({
-        message: 'title is required for creating question',
+        message: 'Title is required to create a question',
       });
     }
 
@@ -21,14 +21,14 @@ module.exports.createQuestion = async (req, res) => {
       question,
     });
   } catch (err) {
-    console.log('*******', err);
+    console.log('Error:', err);
     return res.status(500).json({
       message: 'Internal server error',
     });
   }
 };
 
-// To create an option
+// Create an option
 module.exports.createOptions = async (req, res) => {
   try {
     const questionId = req.params.id;
@@ -36,7 +36,7 @@ module.exports.createOptions = async (req, res) => {
 
     if (!text) {
       return res.status(400).json({
-        message: 'text required for creating option',
+        message: 'Text is required to create an option',
       });
     }
 
@@ -44,7 +44,7 @@ module.exports.createOptions = async (req, res) => {
 
     if (!question) {
       return res.status(400).json({
-        message: 'question not found!',
+        message: 'Question not found',
       });
     }
 
@@ -53,14 +53,14 @@ module.exports.createOptions = async (req, res) => {
       question,
     });
 
-    // create link_to_vote using _id of option
+    // Create a link to vote using the option's _id
     const link_to_vote = `https://polling-system-api0.herokuapp.com/options/${option.id}/add_vote`;
 
     option.link_to_vote = link_to_vote;
 
     option.save();
 
-    // put reference of option in question schema
+    // Add a reference of the option in the question's options field
     await question.updateOne({ $push: { options: option } });
 
     return res.status(200).json({
@@ -68,14 +68,14 @@ module.exports.createOptions = async (req, res) => {
       option,
     });
   } catch (err) {
-    console.log('*******', err);
+    console.log('Error:', err);
     return res.status(500).json({
       message: 'Internal server error',
     });
   }
 };
 
-// To delete a question
+// Delete a question
 module.exports.deleteQuestion = async (req, res) => {
   try {
     const questionId = req.params.id;
@@ -84,41 +84,41 @@ module.exports.deleteQuestion = async (req, res) => {
 
     if (!question) {
       return res.status(400).json({
-        message: 'question not found',
+        message: 'Question not found',
       });
     }
 
-    // if even one of the options of question has votes. It won't be deleted
+    // If any of the options of the question have votes, it cannot be deleted
     if (question.totalVotes > 0) {
       return res.status(400).json({
-        message: 'atleast one of options has votes',
+        message: 'At least one of the options has votes',
       });
     }
 
-    // delete all the options of the question
+    // Delete all the options of the question
     await Option.deleteMany({ question: questionId });
 
-    // delete question
+    // Delete the question
     await Question.findByIdAndDelete(questionId);
 
     return res.status(200).json({
       success: true,
-      message: 'question and associated options deleted successfully!',
+      message: 'Question and associated options deleted successfully!',
     });
   } catch (err) {
-    console.log('*******', err);
+    console.log('Error:', err);
     return res.status(500).json({
       message: 'Internal server error',
     });
   }
 };
 
-// To view a question and it's options
+// View a question and its options
 module.exports.viewQuestion = async (req, res) => {
   try {
     const questionId = req.params.id;
 
-    // populate question with all of its options
+    // Populate the question with all of its options
     const question = await Question.findById(questionId).populate({
       path: 'options',
       model: 'Option',
@@ -126,7 +126,7 @@ module.exports.viewQuestion = async (req, res) => {
 
     if (!question) {
       return res.status(400).json({
-        message: 'question not found',
+        message: 'Question not found',
       });
     }
 
@@ -135,7 +135,7 @@ module.exports.viewQuestion = async (req, res) => {
       question,
     });
   } catch (err) {
-    console.log('*******', err);
+    console.log('Error:', err);
     return res.status(500).json({
       message: 'Internal server error',
     });

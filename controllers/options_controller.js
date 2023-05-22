@@ -10,38 +10,38 @@ module.exports.deleteOption = async (req, res) => {
 
     if (!option) {
       return res.status(400).json({
-        message: 'option not found',
+        message: 'Option not found',
       });
     }
 
-    // if option has atleast one vote it won't be deleted
+    // If the option has at least one vote, it cannot be deleted
     if (option.votes > 0) {
       return res.status(400).json({
-        message: 'this option has atleast one vote',
+        message: 'This option has at least one vote and cannot be deleted',
       });
     }
 
     const question = await Question.findById(option.question);
 
-    // remove reference of this option from question's options field
+    // Remove the reference of this option from the question's options field
     await question.updateOne({ $pull: { options: optionId } });
 
-    // delete the option
+    // Delete the option
     await Option.findByIdAndDelete(optionId);
 
     return res.status(200).json({
       success: true,
-      message: 'option deleted successfully!',
+      message: 'Option deleted successfully!',
     });
   } catch (err) {
-    console.log('*******', err);
+    console.log('Error:', err);
     return res.status(500).json({
       message: 'Internal server error',
     });
   }
 };
 
-// To increase the count of votes
+// Increase the count of votes for an option
 module.exports.addVote = async (req, res) => {
   try {
     const optionId = req.params.id;
@@ -50,16 +50,16 @@ module.exports.addVote = async (req, res) => {
 
     if (!option) {
       return res.status(400).json({
-        message: 'option not found',
+        message: 'Option not found',
       });
     }
 
-    // add one to the value of votes of option
+    // Increment the value of votes for the option by one
     option.votes += 1;
 
     option.save();
 
-    // add one to the value of total votes of question
+    // Increment the value of total votes for the associated question by one
     const question = await Question.findById(option.question);
     question.totalVotes += 1;
 
@@ -70,7 +70,7 @@ module.exports.addVote = async (req, res) => {
       option,
     });
   } catch (err) {
-    console.log('*******', err);
+    console.log('Error:', err);
     return res.status(500).json({
       message: 'Internal server error',
     });

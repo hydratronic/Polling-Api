@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Option Schema
 const optionSchema = new mongoose.Schema(
   {
     text: {
@@ -13,17 +14,18 @@ const optionSchema = new mongoose.Schema(
     link_to_vote: {
       type: String,
     },
-    question:{
+    question: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Question',
       required: true,
-    }
+    },
   },
   {
     timestamps: true,
   }
 );
 
+// Option Model
 const Option = mongoose.model('Option', optionSchema);
 
 module.exports = Option;
